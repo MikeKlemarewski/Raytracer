@@ -1,0 +1,43 @@
+Running my ray tracer:
+
+To compile, run make
+To raytrace a scene file, use the comand: ./raytrace path_to_sceen_file
+
+I've included a bunch of test cases in my makefile:
+
+make test1 - renders example1.scn
+make test2 - renders example2.scn
+make test3 - renders example3.scn
+make test4 - renders example4.scn
+make test5 - renders example5.scn
+
+make testextra - renders a few extra scene files I've included that demonstrate texturemapping spheres and spot lights
+
+make testall - renders all scene files
+
+NOTE: I also have an extra .scn file of a ceiling fan.  None of these make comands render the fan because it takes so long.
+
+//--------------------------------------------------------
+// Features
+//--------------------------------------------------------
+
+I have implemented all required tasks.
+
+I've implemented anti ailiasing which is activated by running the raytracer with the command "anti" appended to it
+	eg. ./raytrace Scenes/example3.scn anti
+
+I've also implemented spot lights.  This effect is always turned on.  You just have to add a spot light to the scene file.
+I've included a spotlight.scn file with a spot light set up.  You can run the raytracer on this file to see the results.
+
+I've also tried to implement depth of field.  This effect is incomplete as I can't figure out how to set the focal point correctly
+You can see what it looks like at the moment by appending "dof" to the end of a command.
+	eg. ./raytrace Scenes/example4.scn dof
+
+
+//-----------------------------------------------------
+// Additional Scenes
+//-----------------------------------------------------
+
+I've also included a scene file called fan.scn that renders a ceiling fan my friend modeled for me.
+He's taking a course on 3D animation and I asked if he had any .obj files I could use.
+I've included a picture of the rendered output.  You may not want to test it as it takes a long time.

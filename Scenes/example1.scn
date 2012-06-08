@@ -1,0 +1,70 @@
+#this is a comment
+output_file renders/example1.ppm
+
+###########camera#############
+cam_point 0.0 0.0 1.0
+cam_lookat 0.0 0.0 0.0
+cam_up 0.0 1.0 0.0
+cam_angle 45
+cam_res 256 256
+cam_depth 8
+cam_end
+
+###########lights##############
+background_color 0.0 0.0 0.0
+light_ambient 1.0 1.0 1.0
+#light_point 1.0 1.0 1.0 0.0 3.0 1.0
+#light_point 0.7 0.7 0.7 0.0 0.0 5.0
+#light_parallel 1.0 1.0 1.0 0.0 -3.0 -1.0
+#light_spot 1.0 1.0 1.0 1.0 2.0 -2.5 0.0 -1.0 0.0 5 20
+
+##########surfaces#############
+
+begin_surface
+surface_sphere -2.1 0.0 -3.0 1.0
+#material_texture phong Scenes/PoolTableWood.ppm 0.3 0.9 1.0 200 0.0 0.0 0.0
+#material_texture phong Scenes/MarbleBeige.ppm 0.3 0.9 1.0 200 0.0 0.0 0.0
+#material phong 0.17 0.18 0.50 0.3 0.9 1.0 20 0.0 1.0 1.5
+#material phong 0.17 0.18 0.50 0.3 0.9 1.0 20 0.5 0.0 0.0
+material phong 0.17 0.18 0.50 0.3 0.9 1.0 200 0.0 0.0 2.3
+#rotateY 45
+#rotateX 90
+#rotateZ 30
+#scale 1.8 0.8 0.8
+#translate 1.0 -1.0 -2.5
+end_surface
+
+begin_surface
+surface_sphere 0.0 0.0 -3.0 1.0
+#material_texture phong Scenes/PoolTableWood.ppm 0.3 0.9 1.0 200 0.0 0.0 0.0
+#material_texture phong Scenes/MarbleBeige.ppm 0.3 0.9 1.0 200 0.0 0.0 0.0
+#material phong 0.17 0.18 0.50 0.3 0.9 1.0 20 0.0 1.0 1.5
+#material phong 0.17 0.18 0.50 0.3 0.9 1.0 20 0.5 0.0 0.0
+material phong 0.5 0.17 0.18 0.3 0.9 1.0 200 0.0 0.0 2.3
+#rotateY 45
+#rotateX 90
+#rotateZ 30
+#scale 1.8 0.8 0.8
+#translate 1.0 -1.0 -2.5
+end_surface
+
+begin_surface
+surface_sphere 2.1 0.0 -3.0 1.0
+#material_texture phong Scenes/PoolTableWood.ppm 0.3 0.9 1.0 200 0.0 0.0 0.0
+#material_texture phong Scenes/MarbleBeige.ppm 0.3 0.9 1.0 200 0.0 0.0 0.0
+#material phong 0.17 0.18 0.50 0.3 0.9 1.0 20 0.0 1.0 1.5
+#material phong 0.17 0.18 0.50 0.3 0.9 1.0 20 0.5 0.0 0.0
+material phong 0.18 0.5 0.17 0.3 0.9 1.0 200 0.0 0.0 2.3
+#rotateY 45
+#rotateX 90
+#rotateZ 30
+#scale 1.8 0.8 0.8
+#translate 1.0 -1.0 -2.5
+end_surface
+
+#begin_surface
+#surface_mesh Scenes/plane.obj
+#material phong 1.0 1.0 1.0 0.3 0.9 1.0 20 0.0 0.0 0.0
+#translate 1.0 -2.5 -2.5
+#rotateX 90
+#end_surface

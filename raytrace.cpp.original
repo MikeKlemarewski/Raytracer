@@ -1,0 +1,267 @@
+#include "SceneBuilder.h"
+
+#define COLOR_DEPTH 255
+#define RAD_TO_DEGREE 180/M_PI
+
+using namespace std;
+
+double fovx, fovy;
+list<vec3> pixels;
+string output_file;
+
+vec3 background_color;
+int width, height;
+vec3 cam_pos;
+vec3 cam_up;
+vec3 cam_lookat;
+double cam_angle;
+int cam_depth;
+double z_depth;
+list<Geometry*> shapes;
+
+vec3 ambient_light;
+list <Light> lights;
+
+
+void makePPM(string filename){
+
+	int color_depth = COLOR_DEPTH;
+
+	ofstream file (filename.c_str());
+	file << "P3\n" << "#" << filename << endl << width << " " << height << endl << color_depth << endl;
+	
+	for(list<vec3>::iterator iter = pixels.begin(); iter!=pixels.end(); ++iter){
+		file << (int)iter->x << " " << (int)iter->y << " " << (int)iter->z << endl;
+	} 
+	file.close();
+}
+
+//Adds ambient component to color vector c
+void calcAmbient(vec3 &c, Geometry *shape){
+	c = shape->getColor() * ambient_light * shape->getAmbient();
+}
+
+//Add diffuse component to color vector c
+vec3 calcDiffuse(Geometry *shape, Ray lightRay, vec3 N){
+	vec3 L = lightRay.getDirection();
+	double diff = max((double)0, shape->getDiffuse() * dot(N,L));
+	return diff * shape->getColor();
+}
+
+//Add specular component to color vector c
+vec3 calcSpecular(Geometry *shape, Ray eyeRay, Ray lightRay, vec3 N, Light light){
+	vec3 E = eyeRay.getDirection();
+	vec3 L = lightRay.getDirection();
+	
+	//Get reflected ray from Normal and 
+	vec3 R = normalize((2 * dot(N,L)*N) - L);
+	double d = dot(E,R);
+	if(d > 0){
+		double spec = pow(d,shape->getCosPower()) * shape->getSpecular();
+		return spec * light.getColor();
+	}
+}
+
+//Main raytracing algorithm
+vec3 castRays(Ray ray, int depth){
+
+	if(depth <= cam_depth){
+		vec3 color, tmp_normal, normal, ray_dir;
+		Ray shadowRay, cameraRay;
+		double tmp_t, t;
+		Geometry *shape;
+		bool hit = false;
+		
+		ray_dir = ray.getDirection();
+		//Check all objects to see if ray hits any	
+		for(list<Geometry*>::iterator iter = shapes.begin(); iter!=shapes.end(); ++iter){
+			if((*iter)->colision(ray, tmp_t, tmp_normal)){
+	
+				hit = true;
+				//Simple depth test to see if object is closer than last object that was hit	
+				if(tmp_t<z_depth){
+					z_depth = tmp_t;
+					shape = *iter;
+					t = tmp_t;
+					normal = tmp_normal;
+				}
+			}
+		}
+		z_depth = 9999999999;
+
+		if(hit){
+			calcAmbient(color,shape);
+			//Minus acounts for rounding errors that may have previously ocurred.
+			//Makes sure the hit position isn't on the wrong side of the surface
+			vec3 hitPos = cam_pos + ((t-0.0000001) * ray_dir);
+
+			bool obstructed = false;
+			//Check shadow ray to each light and see if we need to add lighting
+			for(list<Light>::iterator light = lights.begin(); light!=lights.end(); ++light){
+
+				int light_type = light->getType();
+				//Check to see if shadow ray hits any other geometry
+				for(list<Geometry*>::iterator iter = shapes.begin(); iter!=shapes.end(); ++iter){
+					//Point light
+					if(light_type == 1 || light_type == 3){
+						shadowRay = Ray(hitPos,light->getPosition());
+						if((*iter)->colision(shadowRay)){
+							obstructed = true;
+							break;
+						}
+					}
+					//Parallel light
+					else if(light_type == 2){
+						shadowRay = Ray(hitPos,light->getPosition());
+						shadowRay.setDirection(normalize(-light->getPosition()));
+						if((*iter)->colision(shadowRay)){
+							obstructed = true;
+							break;
+						}
+					}
+				}
+
+				if(!obstructed){
+					cameraRay = Ray(hitPos,cam_pos);
+					normal = normal;
+					//If spotlight, get angle and calculate fall off	
+					if(light_type == 3){
+						double theta = light->getAngle1();
+						double phi = light->getAngle2();
+						double angle = RAD_TO_DEGREE * acos(dot(-shadowRay.getDirection(), light->getDirection()));
+						if(angle < theta){
+							color += calcDiffuse(shape, shadowRay, normal);
+							color += calcSpecular(shape, cameraRay, shadowRay, normal, *light);
+						}
+						else if(angle < phi){
+							double att = 1;
+							double mag = ((10.0/angle - cos(phi/2.0))/(cos(theta/2.0) - cos(phi/2.0)));
+							color += mag * calcDiffuse(shape, shadowRay, normal);
+							color += mag * calcSpecular(shape, cameraRay, shadowRay, normal, *light);
+						}
+					}
+					//Otherwise get all of the light
+					else{
+						color += calcDiffuse(shape, shadowRay, normal);
+						color += calcSpecular(shape, cameraRay, shadowRay, normal, *light);
+					}
+				}
+				obstructed = false;
+			}
+
+			//If the object is reflective, cast a reflected ray
+			double kr = shape->getReflectance();
+			if(kr > 0.0){
+				vec3 R = normalize((2 * dot(normal,-ray_dir)*normal) + ray_dir);
+				Ray reflected_ray = Ray(hitPos,vec3(0,0,0));
+				reflected_ray.setDirection(R);
+				vec3 reflect_color = castRays(reflected_ray,depth+1);
+				color += (kr * reflect_color);
+				if(color.x < 0.0){
+					color.x = 0.0;
+				}
+				if(color.y < 0.0){
+					color.y = 0.0;
+				}
+				if(color.y < 0.0){
+					color.y = 0.0;
+				}
+			}
+			else{
+				if(color.x < 0.0){
+					color.x = 0.0;
+				}
+				if(color.y < 0.0){
+					color.y = 0.0;
+				}
+				if(color.y < 0.0){
+					color.y = 0.0;
+				}
+				return color;
+			}
+		}
+		//If ray hits nothing, return background color
+		else{
+			return (background_color);
+		}	
+	}
+	else{
+		return vec3(0,0,0);
+	}	
+} 
+
+void drawImage(){
+	
+	Ray cast;
+	double x_dir, y_dir;
+	vec3 pixel_color;
+	printf("height %d width %d\n",height, width);	
+	//Loop over each pixel and cast rays into scene
+	for(int j = height-1; j>=0; j--){
+		for(int i = 0; i<width; i++){
+
+
+			x_dir = ((2.0*(double)i-(double)width)/(double)width) * tan(fovx);
+			y_dir = ((2.0*(double)j-(double)height)/(double)height) * tan(fovy);
+		
+			//Create ray and cast it into the scene.  Push returned color to pixel array
+			cast = Ray(cam_pos, vec3(x_dir,y_dir,0.0) + cam_lookat);
+			pixel_color = castRays(cast, 1);
+
+			if(j==height-1 & i ==0){
+				printf("%f %f %f\n",pixel_color.x,pixel_color.y,pixel_color.z);
+			}
+
+			/*Sketchy anti-ailiasing
+			cast = Ray(cam_pos, vec3(x_dir+0.001,y_dir,0.0) + cam_lookat);
+			pixel_color += castRays(cast, 1);
+			cast = Ray(cam_pos, vec3(x_dir,y_dir+0.001,0.0) + cam_lookat);
+			pixel_color += castRays(cast, 1);
+			cast = Ray(cam_pos, vec3(x_dir+0.001,y_dir+0.001,0.0) + cam_lookat);
+			pixel_color += castRays(cast, 1);
+			
+			pixel_color = pixel_color/4.0;
+			*/
+			pixels.push_back(vec3(pixel_color.x * COLOR_DEPTH, pixel_color.y * COLOR_DEPTH, pixel_color.z * COLOR_DEPTH));
+		}
+	} 
+}
+
+//Calculate width of viewing frame in world coordinates
+void setUpView(){
+
+	fovx = cam_angle/180.0 * M_PI;
+	fovy = height/width * fovx;
+	
+}
+
+int main(int argc, char* argv[]){
+
+	//Parse scene file and store values;
+	if(argc > 1){
+		SceneBuilder scene = SceneBuilder(argv[1]);
+		width              = scene.getWidth();	
+		height             = scene.getHeight();
+		output_file        = scene.getOutputFile();
+		background_color   = scene.getBackgroundColor();
+		cam_pos            = scene.getCamPos();	
+		cam_up             = scene.getCamUp();	
+		cam_lookat         = scene.getCamLookat();	
+		cam_angle          = scene.getCamAngle(); cam_depth          = scene.getCamDepth(); shapes             = scene.getShapes();
+		lights             = scene.getLights();
+		ambient_light      = scene.getAmbientLight();
+	}
+	z_depth = 9999999999;
+
+	setUpView();
+	drawImage();
+	makePPM(output_file);
+
+	printf("cam_pos: %f, %f, %f\n",cam_pos.x, cam_pos.y, cam_pos.z);
+	printf("cam_lookat: %f, %f, %f\n",cam_lookat.x, cam_lookat.y, cam_lookat.z);
+	printf("cam_up: %f, %f, %f\n",cam_up.x, cam_up.y, cam_up.z);
+	printf("cam_angle: %f\n",cam_angle);
+	printf("cam_depth: %d\n",cam_depth);
+	
+	return 0;
+}

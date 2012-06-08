@@ -1,0 +1,28 @@
+#this is a comment
+output_file renders/fan.ppm
+
+###########camera#############
+cam_point 0.0 0.0 15.0
+cam_lookat 0.0 0.0 14.0
+cam_up 0.0 1.0 0.0
+cam_angle 45
+cam_res 512 512
+cam_depth 8
+cam_end
+
+###########lights##############
+background_color 0.0 0.0 0.0
+light_ambient 1.0 1.0 1.0
+#light_point 1.0 1.0 1.0 0.0 3.0 1.0
+#light_point 0.7 0.7 0.7 0.0 0.0 5.0
+light_parallel 1.0 1.0 1.0 0.0 -3.0 -1.0
+#light_spot 1.0 1.0 1.0 1.0 2.0 -2.5 0.0 -1.0 0.0 5 20
+
+##########surfaces#############
+
+begin_surface
+surface_mesh Scenes/fan.obj
+material phong 1.0 1.0 1.0 0.3 0.9 1.0 20 0.0 0.0 0.0
+#translate 1.0 -2.5 -2.5
+rotateX 10
+end_surface

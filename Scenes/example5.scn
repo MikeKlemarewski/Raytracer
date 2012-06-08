@@ -1,0 +1,128 @@
+#this is a comment
+output_file renders/example5.ppm
+
+###########camera#############
+cam_point 0.0 0.0 1.0
+cam_lookat 0.0 0.0 0.0
+cam_up 0.0 1.0 0.0
+cam_angle 55
+cam_res 1024 1024
+#cam_res 300 300
+cam_depth 8
+cam_end
+
+###########lights##############
+background_color 0.0 0.0 0.0
+light_ambient 1.0 1.0 1.0
+light_point 0.7 0.7 0.7 2.0 10.0 -2.5
+light_point 0.7 0.7 0.7 -2.0 10.0 -2.5
+#light_parallel 1.0 1.0 1.0 0.0 -3.0 -1.0
+#light_parallel 1.0 1.0 1.0 0.0 -3.0 -1.0
+#light_spot 1.0 1.0 1.0 1.0 2.0 -2.5 0.0 -1.0 0.0 5 20
+
+##########surfaces#############
+
+begin_surface
+surface_mesh Scenes/box.obj
+material phong 1.0 1.0 1.0 0.3 0.9 1.0 20 0.0 0.0 0.0
+translate -6.0 -1.5 -5.0
+rotateY 60
+scale 0.8 2.0 0.8
+end_surface
+
+begin_surface
+surface_mesh Scenes/box.obj
+material phong 1.0 1.0 1.0 0.3 0.9 1.0 20 0.0 0.0 0.0
+translate 6.0 -1.5 -5.0
+rotateY -60
+scale 0.8 2.0 0.8
+end_surface
+
+begin_surface
+surface_mesh Scenes/box.obj
+material phong 1.0 1.0 1.0 0.3 0.9 1.0 20 0.0 0.0 0.0
+translate -4.0 -1.5 -7.0
+rotateY 30
+scale 0.8 3.0 0.8
+end_surface
+
+begin_surface
+surface_mesh Scenes/box.obj
+material phong 1.0 1.0 1.0 0.3 0.9 1.0 20 0.0 0.0 0.0
+translate 4.0 -1.5 -7.0
+rotateY -30
+scale 0.8 3.0 0.8
+end_surface
+
+begin_surface
+surface_mesh Scenes/box.obj
+material phong 1.0 1.0 1.0 0.3 0.9 1.0 20 0.0 0.0 0.0
+translate 0.0 -1.5 -8.5
+#rotateY 30
+scale 0.8 5.0 0.8
+end_surface
+
+begin_surface
+surface_mesh Scenes/plane_small.obj
+material phong 0.5 0.5 0.5 0.3 0.9 1.0 20 0.0 0.0 0.0
+material_texture phong Scenes/mramor6x6.ppm 0.3 0.9 1.0 200 0.0 0.0 0.0
+translate 0.0 -2.5 -10.0
+rotateX -90
+scale 20.0 20.0 1.0
+end_surface
+
+begin_surface
+surface_mesh Scenes/plane_small.obj
+material phong 0.5 0.5 0.5 0.3 0.9 1.0 20 0.0 0.0 0.0
+material_texture phong Scenes/Brick.ppm 0.3 0.9 1.0 200 0.0 0.0 0.0
+translate 0.0 0.0 -15.0
+#rotateX -90
+scale 160.0 160.0 1.0
+end_surface
+
+begin_surface
+surface_sphere 0.0 0.0 0.0 1.0
+material phong 0.18 0.5 0.17 0.3 0.9 1.0 200 0.0 0.8 2.3
+#scale 1.8 0.8 0.8
+translate -6.0 1.5 -5.0
+end_surface
+
+begin_surface
+surface_sphere 0.0 0.0 0.0 1.0
+material phong 0.18 0.5 0.17 0.3 0.9 1.0 200 0.0 0.8 2.3
+#scale 1.8 0.8 0.8
+translate 6.0 1.5 -5.0
+end_surface
+
+begin_surface
+surface_sphere 0.0 0.0 0.0 1.0
+material phong 0.17 0.18 0.5 0.3 0.9 1.0 200 0.8 0.0 2.3
+scale 2.0 1.0 1.0
+rotateX 30
+translate -4.0 3.0 -7.0
+end_surface
+
+begin_surface
+surface_sphere 0.0 0.0 0.0 1.0
+material phong 0.17 0.18 0.5 0.3 0.9 1.0 200 0.8 0.0 2.3
+scale 2.0 1.0 1.0
+rotateX 30
+translate 4.0 3.0 -7.0
+end_surface
+
+begin_surface
+surface_sphere 0.0 0.0 0.0 1.0
+material phong 0.2 0.2 0.2 0.3 0.9 1.0 200 0.3 0.7 1.5
+scale 1.0 2.0 1.0
+translate 0.0 5.5 -8.5
+end_surface
+
+#begin_surface
+#surface_mesh Scenes/bunny_origin.obj
+#material phong 0.51 0.345 0.27 0.3 0.9 1.0 200 0.0 0.0 2.3
+#translate 0.3 -1.4 -2.0
+#rotateX 30
+#rotateY 45
+#rotateZ -90
+#scale 1.5 1.5 1.5
+#end_surface
